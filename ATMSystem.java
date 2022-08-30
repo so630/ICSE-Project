@@ -6,18 +6,12 @@ public class ATMSystem {
     private static Account account;
 
     public static void main(String[] args) {
-        System.out.println("Welcome to ATM System, are you already registered? (yes or no)");
-        char choice = scanner.nextLine().toLowerCase(Locale.ROOT).charAt(0);
-
-        switch (choice) {
-            case 'y':
-                login();
-                break;
-
-            case 'n':
-                register();
-                break;
-        }
+        System.out.println("Welcome to ATM System, please register the first account: ");
+        register();
+        System.out.println("Now, please enter the details for the second account: ");
+        register();
+        System.out.println("Now please login to one of the accounts you just registered...");
+        login();
     }
 
     /**
@@ -34,7 +28,7 @@ public class ATMSystem {
             System.out.println("pin or account number was incorrect.");
             System.out.println("exiting...");
         } else {
-            System.out.println("login successful");
+            System.out.println("login successful\n\n");
             transaction();
         }
     }
@@ -45,10 +39,20 @@ public class ATMSystem {
     private static void register() {
         System.out.println("commencing registering process....");
         int account_number;
-        System.out.print("enter account number: ");
-        account_number = scanner.nextInt();
-        System.out.print("\nenter pin: ");
-        int pin = scanner.nextInt();
+        while (true) {
+            System.out.print("enter account number: ");
+            account_number = scanner.nextInt();
+            if (Accounts.is_present(account_number)) {
+                System.out.println("an account with such an account number is already present, enter again...");
+            } else break;
+        }
+        int pin;
+        while (true) {
+            System.out.print("\nenter pin: ");
+            pin = scanner.nextInt();
+            if (("" + pin).length() == 4) break;
+            else System.out.print("\nthe pin must be 4 digits in length. Enter again...");
+        }
         scanner.nextLine();
         System.out.print("\nenter name: ");
         String name = scanner.nextLine();
@@ -56,17 +60,18 @@ public class ATMSystem {
         String address = scanner.nextLine();
         String type_of_account;
         while (true) {
-            System.out.print("\nenter the type of account (savings or current): ");
-            type_of_account = scanner.nextLine();
-            if (type_of_account.equals("savings") || type_of_account.equals("current")) {
+            System.out.print("\nenter the type of account (s for savings or c for current): ");
+            char c = scanner.nextLine().toLowerCase(Locale.ROOT).charAt(0);
+            if (c == 's' || c == 'c') {
+                type_of_account = c == 's' ? "savings" : "current";
                 break;
             } else {
-                System.out.print("\nthe type of account must be savings or current, not anything else. enter again");
+                System.out.print("\nthe type of account must be s for savings or c for current, not anything else. enter again");
             }
         }
         double balance_amt;
         while (true) {
-            System.out.println("\nenter the balance amount: ");
+            System.out.println("\nenter the amount you would like to initially deposit: ");
             balance_amt = scanner.nextDouble();
 
             if (type_of_account.equals("savings")) {
@@ -88,7 +93,6 @@ public class ATMSystem {
         Accounts.add_account(account); // adding account to array
         System.out.println("register successful");
         System.out.println("\n\n");
-        transaction();
     }
 
     /**
@@ -164,8 +168,10 @@ public class ATMSystem {
         }
         double amt;
         while (true) {
-            System.out.print("enter the amount you wish to deposit: ");
-            amt = scanner.nextDouble();
+            System.out.print("enter the amount you wish to deposit (if you wish to go back to options, type 'g'): ");
+            String c = scanner.nextLine();
+            if (c.toLowerCase(Locale.ROOT).charAt(0) == 'g') return;
+            amt = Double.parseDouble(c);
             if (amt < 0) {
                 System.out.println("amount must be positive, enter again...");
             } else {
@@ -173,7 +179,6 @@ public class ATMSystem {
             }
         }
         account.deposit(amt);
-        scanner.nextLine();
     }
 
     /**
@@ -185,13 +190,14 @@ public class ATMSystem {
         }
         double amt;
         while (true) {
-            System.out.print("enter the amount you wish to withdraw: ");
-            amt = scanner.nextDouble();
+            System.out.print("enter the amount you wish to withdraw (if you wish to go back to options, type 'g'): ");
+            String amt_str = scanner.nextLine();
+            if (amt_str.toLowerCase(Locale.ROOT).charAt(0) == 'g') return;
+            amt = Double.parseDouble(amt_str);
             if (account.type_of_account.equals("savings")) {
                 if (amt <= 25000d && amt <= account.balance_amt && account.balance_amt-amt >= 5000d) {
                     account.withdraw(amt);
                     System.out.println("Rs. " + amt + " has been withdrawn, leaving a balance of " + account.balance_amt);
-                    scanner.nextLine();
                     break;
                 } else if (amt > account.balance_amt) {
                     System.out.println("your balance amount is " + account.balance_amt + ", which is greater than the amount you wish to withdraw (" + amt + "). enter again");
@@ -205,7 +211,6 @@ public class ATMSystem {
                     account.balance_amt -= amt;
                     System.out.println("Rs. " + amt + " has been withdrawn, leaving a balance of " + account.balance_amt);
                     account.withdraw(amt);
-                    scanner.nextLine();
                     break;
                 } else if (amt > account.balance_amt) {
                     System.out.println("your balance amount is " + account.balance_amt + ", which is greater than the amount you wish to withdraw (" + amt + "). enter again");
@@ -259,5 +264,9 @@ public class ATMSystem {
  * amt             | a local variable of withdraw function which is used to input the amount to be withdrawn
  * amt             | a local variable of deposit function which is used to input the amount to be deposited
  * c               | a local variable of print_last_3_transactions function which is used as a simple counter variable
- *                 |
+ * c               | a local variable of the register function which is used to denote the choice the user makes regarding savings or current in the type of account they'd like to register
+ * amt_str         | a local variable of the withdraw function which is used to take the next line of input inputed by the user and check if the user has pressed g in order to go back to the transactions menu
+ * amt_str         | a local variable of the deposit function which is used to take the next line of input inputed by the user and check if the user has pressed g in order to go back to the transactions menu
+ * c               | a local variable of the transaction function which is used to store the choice inputed by the user
+ *
  */

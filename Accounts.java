@@ -31,6 +31,22 @@ public class Accounts {
     }
 
     /**
+     * a utility function to check if an account with a certain account number is present
+     * @param account_number account number which we want to check if account with such account number is present
+     * @return boolean if an account with this account number is present
+     */
+    public static boolean is_present(int account_number) {
+        for (int i = 0; i < accounts.length; i++) {
+            if (accounts[i] == null) continue;
+            if (accounts[i].account_number == account_number) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * check if accounts array is full
      * @return boolean indicating if accounts array is full
      */
@@ -47,5 +63,5 @@ public class Accounts {
  *  account        | parameter of add_account function which is an account to be added to the accounts array
  *  account_number | parameter of search_for_account function which denotes the account number of the account to be searched
  *  pin            | parameter of search_for_account function which denotes the pin of the account to be searched
- *                 |
+ *  account_number | parameter of is_present function which denotes the account number for which it must be checked if an account with that account number is present
  * */
